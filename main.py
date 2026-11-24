@@ -19,6 +19,8 @@ and scoring them against the 45 entries already in the field:
     lands on the first read and reads as a dating bio, not a joke
     about AI. The extra-mile pass split "Rude." into its own
     sentence for comic timing.
+
+Run: python3 main.py — prints the bio and its character count.
 """
 
 import os
@@ -29,14 +31,23 @@ BIO = (
 )
 
 MAX_CHARS = 180
+OUTPUT_PATH = "/output/entry.txt"
+
+
+def validate(line: str) -> None:
+    """The sealed scorer's gate: UTF-8 text, 1-180 chars, one line."""
+    if "\n" in line:
+        raise ValueError("entry must be a single line")
+    if not 1 <= len(line) <= MAX_CHARS:
+        raise ValueError(f"entry is {len(line)} chars, limit {MAX_CHARS}")
+    if line.strip() != line or not line.strip():
+        raise ValueError("entry must not be blank or padded")
 
 
 def main() -> None:
-    assert "\n" not in BIO, "entry must be a single line"
-    assert 1 <= len(BIO) <= MAX_CHARS, f"entry is {len(BIO)} chars, limit {MAX_CHARS}"
-    assert BIO.strip() == BIO and BIO.strip(), "entry must not be blank or padded"
-    os.makedirs("/output", exist_ok=True)
-    with open("/output/entry.txt", "w", encoding="utf-8") as f:
+    validate(BIO)
+    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         f.write(BIO)
     print(BIO)
     print(f"({len(BIO)} characters)")
